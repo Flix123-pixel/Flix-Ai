@@ -1,0 +1,62 @@
+[
+    {
+        "question": "what is ai",
+        "answer": "AI stands for Artificial Intelligence."
+    },
+    {
+        "question": "who are you",
+        "answer": "I am Flix AI, your smart assistant."
+    },
+    {
+        "question": "what is universe",
+        "answer": "The universe contains all space, time, matter, and energy."
+    },
+    {
+        "question": "what is solar system",
+        "answer": "The Solar System contains the Sun and all objects that orbit it."
+    },
+    {
+        "question": "what is moon",
+        "answer": "The Moon is Earth's natural satellite."
+    },
+    {
+        "question": "what is sun",
+        "answer": "The Sun is the star at the center of our Solar System."
+    },
+    {
+        "question": "what is gravity",
+        "answer": "Gravity is a force that attracts objects toward each other."
+    },
+    {
+        "question": "what is water",
+        "answer": "Water is a compound made of hydrogen and oxygen."
+    },
+    {
+        "question": "what is oxygen",
+        "answer": "Oxygen is a gas needed by many living organisms."
+    },
+    {
+        "question": "what is computer",
+        "answer": "A computer is an electronic device that processes information."
+    },
+    {
+        "question": "what is internet",
+        "answer": "The Internet is a global network connecting computers."
+    },
+    {
+        "question": "what is html",
+        "answer": "HTML is used to create the structure of web pages."
+    },
+    {
+        "question": "what is css",
+        "answer": "CSS is used to design and style web pages."
+    },
+    {
+        "question": "what is javascript",
+        "answer": "JavaScript makes websites interactive."
+    },
+    {
+        "question": "what is python",
+        "answer": "Python is a popular programming language."
+    }
+]
