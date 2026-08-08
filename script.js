@@ -358,10 +358,10 @@ else {
         };
 
     }
-function newChat() {
+ function newChat() {
     localStorage.removeItem("flixHistory");
     chatBox.innerHTML = "";
     input.value = "";
-    input.focus();
-}
-}
+ }const newChatBtn = document.getElementById("newChatBtn");
+
+newChatBtn.addEventListener("click", newChat);
