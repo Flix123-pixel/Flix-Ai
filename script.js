@@ -11,10 +11,12 @@ const voiceBtn = document.getElementById("voiceBtn");
 let extraQuestions = {};
 
 
-// Load questions.json
+// ===============================
+// LOAD QUESTIONS.JSON
+// ===============================
 
 fetch("questions.json")
-    .then(response => {
+    .then(function(response) {
 
         if (!response.ok) {
             throw new Error("questions.json not found");
@@ -23,9 +25,9 @@ fetch("questions.json")
         return response.json();
 
     })
-    .then(data => {
+    .then(function(data) {
 
-        data.forEach(item => {
+        data.forEach(function(item) {
 
             extraQuestions[
                 item.question.toLowerCase().trim()
@@ -36,7 +38,7 @@ fetch("questions.json")
         console.log("Questions loaded successfully.");
 
     })
-    .catch(error => {
+    .catch(function(error) {
 
         console.log(
             "questions.json could not be loaded:",
@@ -108,6 +110,7 @@ function addMessage(text, sender) {
     chatBox.scrollTop = chatBox.scrollHeight;
 
     saveHistory();
+
 }
 
 
@@ -151,7 +154,8 @@ function getAnswer(text) {
 
     let answer = "";
 
-    // Check basic questions
+
+    // Basic questions
 
     if (questions[text]) {
 
@@ -159,13 +163,15 @@ function getAnswer(text) {
 
     }
 
-    // Check questions.json
+
+    // questions.json
 
     else if (extraQuestions[text]) {
 
         answer = extraQuestions[text];
 
     }
+
 
     // Calculator
 
@@ -179,13 +185,14 @@ function getAnswer(text) {
 
         }
 
-        catch {
+        catch (error) {
 
             answer = "Invalid calculation.";
 
         }
 
     }
+
 
     // Unknown question
 
@@ -196,7 +203,9 @@ function getAnswer(text) {
 
     }
 
+
     return answer;
+
 }
 
 
@@ -212,8 +221,13 @@ function reply() {
     const text =
         originalText.toLowerCase();
 
+
+    // Empty message
+
     if (text === "") {
+
         return;
+
     }
 
 
@@ -247,7 +261,7 @@ function reply() {
         chatBox.scrollHeight;
 
 
-    // Get answer after small delay
+    // Get answer
 
     setTimeout(function() {
 
@@ -307,14 +321,21 @@ if (
         window.SpeechRecognition ||
         window.webkitSpeechRecognition;
 
+
     const recognition =
         new SpeechRecognition();
 
-    recognition.lang = "en-US";
 
-    recognition.continuous = false;
+    recognition.lang =
+        "en-US";
 
-    recognition.interimResults = false;
+
+    recognition.continuous =
+        false;
+
+
+    recognition.interimResults =
+        false;
 
 
     recognition.onresult =
@@ -357,11 +378,34 @@ else {
 
         };
 
-    }
- function newChat() {
-    localStorage.removeItem("flixHistory");
-    chatBox.innerHTML = "";
-    input.value = "";
- }const newChatBtn = document.getElementById("newChatBtn");
+}
 
-newChatBtn.addEventListener("click", newChat);
+
+// ===============================
+// NEW CHAT
+// ===============================
+
+function newChat() {
+
+    // Delete saved chat
+
+    localStorage.removeItem(
+        "flixHistory"
+    );
+
+
+    // Clear chat screen
+
+    chatBox.innerHTML = "";
+
+
+    // Clear input
+
+    input.value = "";
+
+
+    // Put cursor back in input
+
+    input.focus();
+
+}
