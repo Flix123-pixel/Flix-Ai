@@ -358,3 +358,7 @@ else {
         };
 
     }
+function newChat() {
+    localStorage.removeItem("chatHistory");
+    chatMessages.innerHTML = "";
+}
