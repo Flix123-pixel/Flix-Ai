@@ -359,6 +359,9 @@ else {
 
     }
 function newChat() {
-    localStorage.removeItem("chatHistory");
-    chatMessages.innerHTML = "";
+    localStorage.removeItem("flixHistory");
+    chatBox.innerHTML = "";
+    input.value = "";
+    input.focus();
+}
 }
