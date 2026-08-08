@@ -387,24 +387,24 @@ else {
 
 function newChat() {
 
-    // Delete saved chat
+    // Delete saved chat history
 
     localStorage.removeItem(
         "flixHistory"
     );
 
 
-    // Clear chat screen
+    // Clear all messages
 
     chatBox.innerHTML = "";
 
 
-    // Clear input
+    // Clear input box
 
     input.value = "";
 
 
-    // Put cursor back in input
+    // Focus input box
 
     input.focus();
 
