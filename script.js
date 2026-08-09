@@ -7,6 +7,14 @@ let extraQuestions = {};
 
 
 // =====================================
+// GEMINI API
+// =====================================
+
+const GEMINI_API_KEY =
+    "YOUR_GEMINI_API_KEY_HERE";
+
+
+// =====================================
 // LOAD QUESTIONS.JSON
 // =====================================
 
@@ -203,14 +211,32 @@ function calculate(text) {
 
 
 // =====================================
-// ASK GEMINI BACKEND
+// ASK GEMINI
 // =====================================
 
 async function askGemini(question) {
 
+    if (
+        !GEMINI_API_KEY ||
+        GEMINI_API_KEY ===
+        "YOUR_GEMINI_API_KEY_HERE"
+    ) {
+
+        throw new Error(
+            "Gemini API key is missing."
+        );
+
+    }
+
+
+    const url =
+        "https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=" +
+        encodeURIComponent(GEMINI_API_KEY);
+
+
     const response =
         await fetch(
-            "/api/chat",
+            url,
             {
 
                 method: "POST",
@@ -221,7 +247,35 @@ async function askGemini(question) {
                 },
 
                 body: JSON.stringify({
-                    message: question
+
+                    contents: [
+
+                        {
+
+                            parts: [
+
+                                {
+
+                                    text:
+                                        "You are Flix AI, a helpful AI assistant. Answer the user's question clearly and naturally. If the user asks in Hindi or Hinglish, answer in Hindi/Hinglish. If the user asks in English, answer in English.\n\nUser: " +
+                                        question
+
+                                }
+
+                            ]
+
+                        }
+
+                    ],
+
+                    generationConfig: {
+
+                        temperature: 0.7,
+
+                        maxOutputTokens: 2048
+
+                    }
+
                 })
 
             }
@@ -230,8 +284,16 @@ async function askGemini(question) {
 
     if (!response.ok) {
 
+        const errorText =
+            await response.text();
+
+        console.error(
+            "Gemini API error:",
+            errorText
+        );
+
         throw new Error(
-            "AI server error"
+            "Gemini API request failed."
         );
 
     }
@@ -241,16 +303,28 @@ async function askGemini(question) {
         await response.json();
 
 
-    if (!data.reply) {
+    const answer =
+        data
+            ?.candidates?.[0]
+            ?.content?.parts?.[0]
+            ?.text;
+
+
+    if (!answer) {
+
+        console.error(
+            "Unexpected Gemini response:",
+            data
+        );
 
         throw new Error(
-            "No AI response"
+            "No Gemini response received."
         );
 
     }
 
 
-    return data.reply;
+    return answer.trim();
 
 }
 
@@ -311,7 +385,7 @@ async function getAnswer(text) {
         );
 
         return (
-            "I couldn't connect to the AI server right now."
+            "Sorry, I could not connect to Flix AI right now. Please check your Gemini API key and try again."
         );
 
     }
@@ -344,6 +418,8 @@ async function reply() {
     );
 
 
+    // CLEAR INPUT
+
     input.value = "";
 
 
@@ -373,7 +449,9 @@ async function reply() {
                 originalText
             );
 
+
         thinking.remove();
+
 
         addMessage(
             answer,
@@ -387,6 +465,7 @@ async function reply() {
         console.error(error);
 
         thinking.remove();
+
 
         addMessage(
             "Sorry, something went wrong.",
@@ -459,8 +538,10 @@ if (
     recognition.lang =
         "en-US";
 
+
     recognition.continuous =
         false;
+
 
     recognition.interimResults =
         false;
@@ -536,11 +617,14 @@ function newChat() {
         "flixHistory"
     );
 
+
     chatBox.innerHTML =
         "";
 
+
     input.value =
         "";
+
 
     input.focus();
 
