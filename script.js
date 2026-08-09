@@ -1,3 +1,10 @@
+"use strict";
+
+/* =====================================
+   FLIX AI - OFFLINE VERSION
+   NO API
+===================================== */
+
 const input = document.getElementById("prompt");
 const chatBox = document.getElementById("chatBox");
 const sendBtn = document.getElementById("sendBtn");
@@ -6,15 +13,9 @@ const voiceBtn = document.getElementById("voiceBtn");
 let extraQuestions = {};
 
 
-// =====================================
-// GEMINI API
-// =====================================
-
-const GEMINI_API_KEY =
-    AQ.Ab8RN6LCYKd2Hj14pP8tVAFJezyv0XlHz7It66iB7E_T3TVISw
-// =====================================
-// LOAD QUESTIONS.JSON
-// =====================================
+/* =====================================
+   LOAD QUESTIONS.JSON
+===================================== */
 
 fetch("questions.json")
     .then(response => {
@@ -55,9 +56,9 @@ fetch("questions.json")
     });
 
 
-// =====================================
-// BASIC QUESTIONS
-// =====================================
+/* =====================================
+   BASIC QUESTIONS
+===================================== */
 
 const questions = {
 
@@ -95,14 +96,56 @@ const questions = {
         "You're welcome!",
 
     "bye":
-        "Goodbye! Have a nice day."
+        "Goodbye! Have a nice day.",
+
+    "good morning":
+        "Good morning! How can I help you?",
+
+    "good afternoon":
+        "Good afternoon! What would you like to know?",
+
+    "good evening":
+        "Good evening! How can I help you?",
+
+    "what is your name":
+        "My name is Flix AI.",
+
+    "are you ai":
+        "Yes. I am Flix AI, a browser-based AI assistant.",
+
+    "how are you":
+        "I'm doing great! Thanks for asking.",
+
+    "what can you do":
+        "I can answer questions stored in my local knowledge base, solve basic calculations, and respond to common questions.",
+
+    "who made you":
+        "I was created as Flix AI.",
+
+    "what is flix ai":
+        "Flix AI is a browser-based AI assistant project.",
+
+    "what is internet":
+        "The Internet is a worldwide network that connects computers and devices.",
+
+    "what is javascript":
+        "JavaScript is a programming language commonly used to make websites interactive.",
+
+    "what is html":
+        "HTML is the standard markup language used to structure web pages.",
+
+    "what is css":
+        "CSS is used to style and design web pages.",
+
+    "what is website":
+        "A website is a collection of web pages that can be accessed through a web browser."
 
 };
 
 
-// =====================================
-// ADD MESSAGE
-// =====================================
+/* =====================================
+   ADD MESSAGE
+===================================== */
 
 function addMessage(text, sender) {
 
@@ -125,9 +168,9 @@ function addMessage(text, sender) {
 }
 
 
-// =====================================
-// SAVE HISTORY
-// =====================================
+/* =====================================
+   SAVE HISTORY
+===================================== */
 
 function saveHistory() {
 
@@ -139,9 +182,9 @@ function saveHistory() {
 }
 
 
-// =====================================
-// LOAD HISTORY
-// =====================================
+/* =====================================
+   LOAD HISTORY
+===================================== */
 
 window.addEventListener(
     "load",
@@ -163,9 +206,9 @@ window.addEventListener(
 );
 
 
-// =====================================
-// CALCULATOR
-// =====================================
+/* =====================================
+   CALCULATOR
+===================================== */
 
 function calculate(text) {
 
@@ -208,128 +251,9 @@ function calculate(text) {
 }
 
 
-// =====================================
-// ASK GEMINI
-// =====================================
-
-async function askGemini(question) {
-
-    if (
-        !GEMINI_API_KEY ||
-        GEMINI_API_KEY ===
-        "YOUR_GEMINI_API_KEY_HERE"
-    ) {
-
-        throw new Error(
-            "Gemini API key is missing."
-        );
-
-    }
-
-
-    const url =
-        "https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=" +
-        encodeURIComponent(GEMINI_API_KEY);
-
-
-    const response =
-        await fetch(
-            url,
-            {
-
-                method: "POST",
-
-                headers: {
-                    "Content-Type":
-                        "application/json"
-                },
-
-                body: JSON.stringify({
-
-                    contents: [
-
-                        {
-
-                            parts: [
-
-                                {
-
-                                    text:
-                                        "You are Flix AI, a helpful AI assistant. Answer the user's question clearly and naturally. If the user asks in Hindi or Hinglish, answer in Hindi/Hinglish. If the user asks in English, answer in English.\n\nUser: " +
-                                        question
-
-                                }
-
-                            ]
-
-                        }
-
-                    ],
-
-                    generationConfig: {
-
-                        temperature: 0.7,
-
-                        maxOutputTokens: 2048
-
-                    }
-
-                })
-
-            }
-        );
-
-
-    if (!response.ok) {
-
-        const errorText =
-            await response.text();
-
-        console.error(
-            "Gemini API error:",
-            errorText
-        );
-
-        throw new Error(
-            "Gemini API request failed."
-        );
-
-    }
-
-
-    const data =
-        await response.json();
-
-
-    const answer =
-        data
-            ?.candidates?.[0]
-            ?.content?.parts?.[0]
-            ?.text;
-
-
-    if (!answer) {
-
-        console.error(
-            "Unexpected Gemini response:",
-            data
-        );
-
-        throw new Error(
-            "No Gemini response received."
-        );
-
-    }
-
-
-    return answer.trim();
-
-}
-
-
-// =====================================
-// GET ANSWER
-// =====================================
+/* =====================================
+   GET ANSWER
+===================================== */
 
 async function getAnswer(text) {
 
@@ -337,7 +261,7 @@ async function getAnswer(text) {
         text.toLowerCase().trim();
 
 
-    // BASIC QUESTIONS
+    /* BASIC QUESTIONS */
 
     if (questions[cleanText]) {
 
@@ -346,7 +270,7 @@ async function getAnswer(text) {
     }
 
 
-    // QUESTIONS.JSON
+    /* QUESTIONS.JSON */
 
     if (extraQuestions[cleanText]) {
 
@@ -355,7 +279,7 @@ async function getAnswer(text) {
     }
 
 
-    // CALCULATOR
+    /* CALCULATOR */
 
     const calculation =
         calculate(cleanText);
@@ -367,33 +291,19 @@ async function getAnswer(text) {
     }
 
 
-    // GEMINI
+    /* UNKNOWN QUESTION */
 
-    try {
-
-        return await askGemini(text);
-
-    }
-
-    catch (error) {
-
-        console.error(
-            "Gemini error:",
-            error
-        );
-
-        return (
-            "Sorry, I could not connect to Flix AI right now. Please check your Gemini API key and try again."
-        );
-
-    }
+    return (
+        "Sorry, I don't know the answer to that yet. " +
+        "You can add this question and answer to questions.json."
+    );
 
 }
 
 
-// =====================================
-// SEND MESSAGE
-// =====================================
+/* =====================================
+   SEND MESSAGE
+===================================== */
 
 async function reply() {
 
@@ -408,7 +318,7 @@ async function reply() {
     }
 
 
-    // USER MESSAGE
+    /* USER MESSAGE */
 
     addMessage(
         originalText,
@@ -416,12 +326,12 @@ async function reply() {
     );
 
 
-    // CLEAR INPUT
+    /* CLEAR INPUT */
 
     input.value = "";
 
 
-    // THINKING
+    /* THINKING */
 
     const thinking =
         document.createElement("div");
@@ -475,9 +385,9 @@ async function reply() {
 }
 
 
-// =====================================
-// SEND BUTTON
-// =====================================
+/* =====================================
+   SEND BUTTON
+===================================== */
 
 if (sendBtn) {
 
@@ -489,9 +399,9 @@ if (sendBtn) {
 }
 
 
-// =====================================
-// ENTER KEY
-// =====================================
+/* =====================================
+   ENTER KEY
+===================================== */
 
 if (input) {
 
@@ -515,9 +425,9 @@ if (input) {
 }
 
 
-// =====================================
-// VOICE TYPING
-// =====================================
+/* =====================================
+   VOICE TYPING
+===================================== */
 
 if (
     "webkitSpeechRecognition" in window ||
@@ -577,7 +487,17 @@ if (
             "click",
             function() {
 
-                recognition.start();
+                try {
+
+                    recognition.start();
+
+                }
+
+                catch (error) {
+
+                    console.log(error);
+
+                }
 
             }
         );
@@ -605,9 +525,9 @@ else {
 }
 
 
-// =====================================
-// NEW CHAT
-// =====================================
+/* =====================================
+   NEW CHAT
+===================================== */
 
 function newChat() {
 
@@ -625,5 +545,23 @@ function newChat() {
 
 
     input.focus();
+
+}
+
+
+/* =====================================
+   OPTIONAL NEW CHAT BUTTON
+===================================== */
+
+const newChatBtn =
+    document.getElementById("newChatBtn");
+
+
+if (newChatBtn) {
+
+    newChatBtn.addEventListener(
+        "click",
+        newChat
+    );
 
 }
