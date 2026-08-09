@@ -3,20 +3,15 @@ const chatBox = document.getElementById("chatBox");
 const sendBtn = document.getElementById("sendBtn");
 const voiceBtn = document.getElementById("voiceBtn");
 
-
-// ===============================
-// EXTRA QUESTIONS
-// ===============================
-
 let extraQuestions = {};
 
 
-// ===============================
+// =====================================
 // LOAD QUESTIONS.JSON
-// ===============================
+// =====================================
 
 fetch("questions.json")
-    .then(function(response) {
+    .then(response => {
 
         if (!response.ok) {
             throw new Error("questions.json not found");
@@ -25,20 +20,26 @@ fetch("questions.json")
         return response.json();
 
     })
-    .then(function(data) {
+    .then(data => {
 
-        data.forEach(function(item) {
+        if (!Array.isArray(data)) return;
 
-            extraQuestions[
-                item.question.toLowerCase().trim()
-            ] = item.answer;
+        data.forEach(item => {
+
+            if (item.question && item.answer) {
+
+                extraQuestions[
+                    item.question.toLowerCase().trim()
+                ] = item.answer;
+
+            }
 
         });
 
-        console.log("Questions loaded successfully.");
+        console.log("Questions loaded.");
 
     })
-    .catch(function(error) {
+    .catch(error => {
 
         console.log(
             "questions.json could not be loaded:",
@@ -48,9 +49,9 @@ fetch("questions.json")
     });
 
 
-// ===============================
-// BASIC AI QUESTIONS
-// ===============================
+// =====================================
+// BASIC QUESTIONS
+// =====================================
 
 const questions = {
 
@@ -64,7 +65,7 @@ const questions = {
         "Hey! Welcome to Flix AI.",
 
     "who are you":
-        "I am Flix AI, your smart assistant.",
+        "I am Flix AI, your smart AI assistant.",
 
     "what is ai":
         "AI stands for Artificial Intelligence.",
@@ -73,13 +74,13 @@ const questions = {
         "Earth is the third planet from the Sun.",
 
     "what is universe":
-        "The universe contains galaxies, stars, planets, and everything that exists.",
+        "The universe contains galaxies, stars, planets and everything that exists.",
 
     "what is computer":
         "A computer is an electronic device that processes data.",
 
     "what is coding":
-        "Coding means writing instructions for computers.",
+        "Coding means writing instructions that computers can understand.",
 
     "thank you":
         "You're welcome!",
@@ -93,30 +94,34 @@ const questions = {
 };
 
 
-// ===============================
+// =====================================
 // ADD MESSAGE
-// ===============================
+// =====================================
 
 function addMessage(text, sender) {
 
-    const div = document.createElement("div");
+    const div =
+        document.createElement("div");
 
-    div.className = "bubble " + sender;
+    div.className =
+        "bubble " + sender;
 
-    div.innerText = text;
+    div.innerText =
+        text;
 
     chatBox.appendChild(div);
 
-    chatBox.scrollTop = chatBox.scrollHeight;
+    chatBox.scrollTop =
+        chatBox.scrollHeight;
 
     saveHistory();
 
 }
 
 
-// ===============================
-// SAVE CHAT HISTORY
-// ===============================
+// =====================================
+// SAVE HISTORY
+// =====================================
 
 function saveHistory() {
 
@@ -128,110 +133,210 @@ function saveHistory() {
 }
 
 
-// ===============================
-// LOAD CHAT HISTORY
-// ===============================
+// =====================================
+// LOAD HISTORY
+// =====================================
 
-window.addEventListener("load", function() {
+window.addEventListener(
+    "load",
+    function() {
 
-    const oldChat =
-        localStorage.getItem("flixHistory");
+        const oldChat =
+            localStorage.getItem(
+                "flixHistory"
+            );
 
-    if (oldChat) {
+        if (oldChat) {
 
-        chatBox.innerHTML = oldChat;
-
-    }
-
-});
-
-
-// ===============================
-// GET AI ANSWER
-// ===============================
-
-function getAnswer(text) {
-
-    let answer = "";
-
-
-    // Basic questions
-
-    if (questions[text]) {
-
-        answer = questions[text];
-
-    }
-
-
-    // questions.json
-
-    else if (extraQuestions[text]) {
-
-        answer = extraQuestions[text];
-
-    }
-
-
-    // Calculator
-
-    else if (/^[0-9+\-*/().\s]+$/.test(text)) {
-
-        try {
-
-            answer = Function(
-                '"use strict"; return (' + text + ')'
-            )().toString();
+            chatBox.innerHTML =
+                oldChat;
 
         }
 
-        catch (error) {
+    }
+);
 
-            answer = "Invalid calculation.";
+
+// =====================================
+// CALCULATOR
+// =====================================
+
+function calculate(text) {
+
+    if (
+        !/^[0-9+\-*/().\s]+$/.test(text)
+    ) {
+
+        return null;
+
+    }
+
+    try {
+
+        const result =
+            Function(
+                '"use strict"; return (' +
+                text +
+                ')'
+            )();
+
+        if (
+            typeof result === "number" &&
+            isFinite(result)
+        ) {
+
+            return String(result);
 
         }
 
     }
 
+    catch (error) {
 
-    // Unknown question
-
-    else {
-
-        answer =
-            "Sorry, I don't know this yet. I am still learning.";
+        return null;
 
     }
 
-
-    return answer;
+    return null;
 
 }
 
 
-// ===============================
-// SEND MESSAGE
-// ===============================
+// =====================================
+// ASK GEMINI BACKEND
+// =====================================
 
-function reply() {
+async function askGemini(question) {
+
+    const response =
+        await fetch(
+            "/api/chat",
+            {
+
+                method: "POST",
+
+                headers: {
+                    "Content-Type":
+                        "application/json"
+                },
+
+                body: JSON.stringify({
+                    message: question
+                })
+
+            }
+        );
+
+
+    if (!response.ok) {
+
+        throw new Error(
+            "AI server error"
+        );
+
+    }
+
+
+    const data =
+        await response.json();
+
+
+    if (!data.reply) {
+
+        throw new Error(
+            "No AI response"
+        );
+
+    }
+
+
+    return data.reply;
+
+}
+
+
+// =====================================
+// GET ANSWER
+// =====================================
+
+async function getAnswer(text) {
+
+    const cleanText =
+        text.toLowerCase().trim();
+
+
+    // BASIC QUESTIONS
+
+    if (questions[cleanText]) {
+
+        return questions[cleanText];
+
+    }
+
+
+    // QUESTIONS.JSON
+
+    if (extraQuestions[cleanText]) {
+
+        return extraQuestions[cleanText];
+
+    }
+
+
+    // CALCULATOR
+
+    const calculation =
+        calculate(cleanText);
+
+    if (calculation !== null) {
+
+        return calculation;
+
+    }
+
+
+    // GEMINI
+
+    try {
+
+        return await askGemini(text);
+
+    }
+
+    catch (error) {
+
+        console.error(
+            "Gemini error:",
+            error
+        );
+
+        return (
+            "I couldn't connect to the AI server right now."
+        );
+
+    }
+
+}
+
+
+// =====================================
+// SEND MESSAGE
+// =====================================
+
+async function reply() {
 
     const originalText =
         input.value.trim();
 
-    const text =
-        originalText.toLowerCase();
 
-
-    // Empty message
-
-    if (text === "") {
+    if (!originalText) {
 
         return;
 
     }
 
 
-    // Add user message
+    // USER MESSAGE
 
     addMessage(
         originalText,
@@ -239,12 +344,10 @@ function reply() {
     );
 
 
-    // Clear input
-
     input.value = "";
 
 
-    // Thinking message
+    // THINKING
 
     const thinking =
         document.createElement("div");
@@ -255,18 +358,20 @@ function reply() {
     thinking.innerText =
         "Thinking...";
 
-    chatBox.appendChild(thinking);
+    chatBox.appendChild(
+        thinking
+    );
 
     chatBox.scrollTop =
         chatBox.scrollHeight;
 
 
-    // Get answer
-
-    setTimeout(function() {
+    try {
 
         const answer =
-            getAnswer(text);
+            await getAnswer(
+                originalText
+            );
 
         thinking.remove();
 
@@ -275,42 +380,67 @@ function reply() {
             "ai"
         );
 
-    }, 500);
+    }
+
+    catch (error) {
+
+        console.error(error);
+
+        thinking.remove();
+
+        addMessage(
+            "Sorry, something went wrong.",
+            "ai"
+        );
+
+    }
 
 }
 
 
-// ===============================
+// =====================================
 // SEND BUTTON
-// ===============================
+// =====================================
 
-sendBtn.addEventListener(
-    "click",
-    reply
-);
+if (sendBtn) {
+
+    sendBtn.addEventListener(
+        "click",
+        reply
+    );
+
+}
 
 
-// ===============================
-// ENTER BUTTON
-// ===============================
+// =====================================
+// ENTER KEY
+// =====================================
 
-input.addEventListener(
-    "keydown",
-    function(event) {
+if (input) {
 
-        if (event.key === "Enter") {
+    input.addEventListener(
+        "keydown",
+        function(event) {
 
-            reply();
+            if (
+                event.key === "Enter"
+            ) {
+
+                event.preventDefault();
+
+                reply();
+
+            }
 
         }
+    );
 
-    }
-);
+}
 
 
-// ===============================
+// =====================================
 // VOICE TYPING
-// ===============================
+// =====================================
 
 if (
     "webkitSpeechRecognition" in window ||
@@ -329,10 +459,8 @@ if (
     recognition.lang =
         "en-US";
 
-
     recognition.continuous =
         false;
-
 
     recognition.interimResults =
         false;
@@ -341,8 +469,12 @@ if (
     recognition.onresult =
         function(event) {
 
+            const text =
+                event.results[0][0]
+                    .transcript;
+
             input.value =
-                event.results[0][0].transcript;
+                text;
 
             reply();
 
@@ -350,61 +482,65 @@ if (
 
 
     recognition.onerror =
-        function() {
+        function(error) {
 
             console.log(
-                "Voice recognition error."
+                "Voice error:",
+                error
             );
 
         };
 
 
-    voiceBtn.onclick =
-        function() {
+    if (voiceBtn) {
 
-            recognition.start();
+        voiceBtn.addEventListener(
+            "click",
+            function() {
 
-        };
+                recognition.start();
+
+            }
+        );
+
+    }
 
 }
 else {
 
-    voiceBtn.onclick =
-        function() {
+    if (voiceBtn) {
 
-            alert(
-                "Voice typing is not supported in this browser."
-            );
+        voiceBtn.addEventListener(
+            "click",
+            function() {
 
-        };
+                alert(
+                    "Voice typing is not supported in this browser."
+                );
+
+            }
+        );
+
+    }
 
 }
 
 
-// ===============================
+// =====================================
 // NEW CHAT
-// ===============================
+// =====================================
 
 function newChat() {
-
-    // Delete saved chat history
 
     localStorage.removeItem(
         "flixHistory"
     );
 
+    chatBox.innerHTML =
+        "";
 
-    // Clear all messages
-
-    chatBox.innerHTML = "";
-
-
-    // Clear input box
-
-    input.value = "";
-
-
-    // Focus input box
+    input.value =
+        "";
 
     input.focus();
 
