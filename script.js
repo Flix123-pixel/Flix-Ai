@@ -11,9 +11,7 @@ let extraQuestions = {};
 // =====================================
 
 const GEMINI_API_KEY =
-    "YOUR_GEMINI_API_KEY_HERE";
-
-
+    AQ.Ab8RN6LCYKd2Hj14pP8tVAFJezyv0XlHz7It66iB7E_T3TVISw
 // =====================================
 // LOAD QUESTIONS.JSON
 // =====================================
